@@ -16,7 +16,7 @@ apt-get()
 }
 
 MAINLINE_REPO="git://git.launchpad.net/~ubuntu-kernel-test/ubuntu/+source/linux/+git/mainline-crack"
-MAINLINE_REPO="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
+#MAINLINE_REPO="https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
 MAINLINE_BRANCH="cod/mainline"
 
 case "${1:-}" in
