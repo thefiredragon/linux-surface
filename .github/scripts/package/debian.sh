@@ -67,7 +67,9 @@ build-packages)
 
     # get ubuntu mainline source
     # see https://kernel.ubuntu.com/~kernel-ppa/mainline
-    git clone "${MAINLINE_REPO}" --branch "${MAINLINE_BRANCH}/v${KERNEL_VERSION}" --depth 1 linux
+    # git clone "${MAINLINE_REPO}" --branch "${MAINLINE_BRANCH}/v${KERNEL_VERSION}" --depth 1 linux
+
+    git clone "${MAINLINE_REPO}" --branch "v${KERNEL_VERSION}" --depth 1 linux
 
     if [ -d "keys" ]; then
         mv keys linux
