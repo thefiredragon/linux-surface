@@ -84,7 +84,7 @@ build-packages)
     git add .
     git commit --allow-empty -m "Apply linux-surface packaging patches"
 
-    KERNEL_MAJORVER="${KERNEL_VERSION%.*}"
+    # KERNEL_MAJORVER="${KERNEL_VERSION%.*}"
     PATCHES="../../../../patches/${KERNEL_MAJORVER}"
 
     # apply surface patches
