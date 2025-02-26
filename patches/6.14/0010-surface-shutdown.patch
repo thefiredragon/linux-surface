@@ -1,7 +1,32 @@
-diff -rupN a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
---- a/drivers/pci/pci-driver.c	2025-02-10 09:24:12.000000000 +0100
-+++ b/drivers/pci/pci-driver.c	2025-02-10 13:21:20.083999179 +0100
-@@ -505,6 +505,9 @@ static void pci_device_shutdown(struct d
+From e88946a0b6535c5a7e31d30f345551df35ac1ef5 Mon Sep 17 00:00:00 2001
+From: Maximilian Luz <luzmaximilian@gmail.com>
+Date: Sun, 19 Feb 2023 22:12:24 +0100
+Subject: [PATCH] PCI: Add quirk to prevent calling shutdown mehtod
+
+Work around buggy EFI firmware: On some Microsoft Surface devices
+(Surface Pro 9 and Surface Laptop 5) the EFI ResetSystem call with
+EFI_RESET_SHUTDOWN doesn't function properly. Instead of shutting the
+system down, it returns and the system stays on.
+
+It turns out that this only happens after PCI shutdown callbacks ran for
+specific devices. Excluding those devices from the shutdown process
+makes the ResetSystem call work as expected.
+
+TODO: Maybe we can find a better way or the root cause of this?
+
+Not-Signed-off-by: Maximilian Luz <luzmaximilian@gmail.com>
+Patchset: surface-shutdown
+---
+ drivers/pci/pci-driver.c |  3 +++
+ drivers/pci/quirks.c     | 36 ++++++++++++++++++++++++++++++++++++
+ include/linux/pci.h      |  1 +
+ 3 files changed, 40 insertions(+)
+
+diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
+index 35270172c833..529779994ef6 100644
+--- a/drivers/pci/pci-driver.c
++++ b/drivers/pci/pci-driver.c
+@@ -505,6 +505,9 @@ static void pci_device_shutdown(struct device *dev)
  	struct pci_dev *pci_dev = to_pci_dev(dev);
  	struct pci_driver *drv = pci_dev->driver;
  
@@ -11,10 +36,11 @@ diff -rupN a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
  	pm_runtime_resume(dev);
  
  	if (drv && drv->shutdown)
-diff -rupN a/drivers/pci/quirks.c b/drivers/pci/quirks.c
---- a/drivers/pci/quirks.c	2025-02-10 09:24:12.000000000 +0100
-+++ b/drivers/pci/quirks.c	2025-02-10 13:21:20.085999151 +0100
-@@ -6315,3 +6315,39 @@ static void pci_mask_replay_timer_timeou
+diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+index 8103bc24a54e..e8fa8d810925 100644
+--- a/drivers/pci/quirks.c
++++ b/drivers/pci/quirks.c
+@@ -6301,3 +6301,39 @@ static void pci_mask_replay_timer_timeout(struct pci_dev *pdev)
  DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_GLI, 0x9750, pci_mask_replay_timer_timeout);
  DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_GLI, 0x9755, pci_mask_replay_timer_timeout);
  #endif
@@ -54,10 +80,11 @@ diff -rupN a/drivers/pci/quirks.c b/drivers/pci/quirks.c
 +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_INTEL, 0x462f, quirk_no_shutdown);  // Thunderbolt 4 PCI Express Root Port
 +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_INTEL, 0x466d, quirk_no_shutdown);  // Thunderbolt 4 NHI
 +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_INTEL, 0x46a8, quirk_no_shutdown);  // GPU
-diff -rupN a/include/linux/pci.h b/include/linux/pci.h
---- a/include/linux/pci.h	2025-02-10 09:24:12.000000000 +0100
-+++ b/include/linux/pci.h	2025-02-10 13:21:20.087999122 +0100
-@@ -476,6 +476,7 @@ struct pci_dev {
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index 4e77c4230c0a..a4b0e6ef6cfe 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -467,6 +467,7 @@ struct pci_dev {
  	unsigned int	no_command_memory:1;	/* No PCI_COMMAND_MEMORY */
  	unsigned int	rom_bar_overlap:1;	/* ROM BAR disable broken */
  	unsigned int	rom_attr_enabled:1;	/* Display of ROM attribute enabled? */
@@ -65,3 +92,6 @@ diff -rupN a/include/linux/pci.h b/include/linux/pci.h
  	pci_dev_flags_t dev_flags;
  	atomic_t	enable_cnt;	/* pci_enable_device has been called */
  
+-- 
+2.47.1
+
