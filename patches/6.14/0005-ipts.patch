@@ -214,8 +214,7 @@ diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
 index f8a56d631242..38eb29e4cc31 100644
 --- a/drivers/hid/Kconfig
 +++ b/drivers/hid/Kconfig
-@@ -1386,12 +1386,14 @@ source "drivers/hid/amd-sfh-hid/Kconfig"
- 
+@@ -1386,11 +1386,13 @@ source "drivers/hid/amd-sfh-hid/Kconfig"
  source "drivers/hid/surface-hid/Kconfig"
  
  source "drivers/hid/intel-thc-hid/Kconfig"
