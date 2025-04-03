@@ -1,24 +1,9 @@
-
 # Linux Surface
 
 Linux running on the Microsoft Surface devices.
 Follow the instructions below to install the latest kernel.
 
 [Announcements and Updates](https://github.com/linux-surface/linux-surface/issues/96) | [Upstream Status](https://github.com/linux-surface/linux-surface/issues/205)
-
-
-## Notes for RC6
-For touch you'll need to backlist intel_quickspi
-intel_quickspi is currently not working well. Touch will be not working after some time of device usage.
-
-> add to the end of /etc/modprobe.d/blacklist.conf the folowing
-
-```
-# Intel ITHC
-blacklist intel_quickspi
-
-```
-
 
 ### Why / About this Project
 
